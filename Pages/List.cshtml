@@ -1,0 +1,35 @@
+@page "/list"
+
+@using Blazor.FileReader;
+
+@inject IFileReaderService fileReaderService;
+
+<h1>List</h1>
+
+<p>Current count: @currentCount</p>
+
+<p>
+    <input type="file" id="files" webkitdirectory directory multiple ref="files"/>
+</p>
+
+<button class="btn btn-primary" onclick="@Export">Export</button>
+
+@functions {
+    int currentCount = 0;
+    ElementRef files;
+
+    async Task Export()
+    {
+        var filesArray = await fileReaderService.CreateReference(files).EnumerateFilesAsync();
+
+        foreach(var file in filesArray)
+        {
+            var fileInfo = await file.ReadFileInfoAsync();
+
+            if (fileInfo.Name.EndsWith(".csv"))
+            {
+                currentCount++;
+            }
+        }
+    }
+}
